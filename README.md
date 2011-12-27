@@ -30,7 +30,7 @@ Currently, django-contenteditable supports:
 - The other features should work on any browser supported by jQuery that can do XMLHttpRequest.
 
 ## Security ##
-Currently we don't check if a user has editable rights when parsing template tags, so the only security is that `$.post` calls fail because of the @require_login decorator you **must** put in contenteditable's views.
+Currently we don't check if a user has editable rights when parsing template tags, so the only security is that `$.post` calls fail because of the `@require_login` decorator you **must** put in contenteditable's views.
 In the next few days I'll fix this.
 
 ## Bugs ##
@@ -121,6 +121,7 @@ In most of the cases you should only add a `{% editablesomething... %}` tag in t
 ```
 - Other attributes (id, style,...) usually doesn't influence the behaviour of django-contenteditable, but it may override your onclick, onfocus, onblur and onchange events.
 
+
 #### Adding a _insert something and press enter_ field ####
 This code displays a span with a placeholder text. 
 When the span is blurred and it has some text (not empty and not placeholder) a new element is created and the span value (`.html()`) will be assigned to it's attribute named FIELD_NAME.
@@ -132,6 +133,7 @@ When the span is blurred and it has some text (not empty and not placeholder) a 
 * `-1` is the Primary Key of the element we are going to edit. `-1` means _add a new element_
 * `FIELD_NAME` is the field in which we'll put content inserted in the span element
 * `PLACEHOLDER` is a placeholder text to display where there is not text in the span
+
 
 #### Adding an edit form with multiple fields ####
 Suppose we are in a page that displays a full news article.
@@ -191,7 +193,10 @@ In `<head>` include `fileuploader.js` and, if you like, `fileuploader.css`:
 <link rel="stylesheet" type="text/css" src="{{ STATIC_URL }}_css/fileuploader.css" />
 ```
 
-```django
+Write some HTML and JavaScript:
+
+```html
+...
 <div id="uploaderlist">File list will be displayed here</div>
 <div id="droparea">Files dropped in this area will be uploaded</div>
 ...
@@ -211,12 +216,19 @@ In `<head>` include `fileuploader.js` and, if you like, `fileuploader.css`:
 		}
 	}
 </script>
-{% insert_uploader "droparea" %}
 ...
 ```
 
+Insert the uploader's JavaScript
+
+```django
+{% insert_uploader "droparea" %}
+```
+
 ## Views ##
-Coming soon...
+
+
+
 
 ## Tag Reference ##
 Coming soon...
