@@ -64,6 +64,7 @@ class _StrChunk():
 
 ### Saving an image from POST data ###
 _views.py_
+
 ```python
 	""" 
 		class MyImageModel(models.Model):
@@ -121,11 +122,13 @@ In most of the cases you should only add a `{% editablesomething... %}` tag in t
 - Other attributes (id, style,...) usually doesn't influence the behaviour of django-contenteditable, but it may override your onclick, onfocus, onblur and onchange events.
 
 #### Adding a _insert something and press enter_ field ####
+This code displays a span with a placeholder text. 
+When the span is blurred and it has some text (not empty and not placeholder) a new element is created and the span value (`.html()`) will be assigned to it's attribute named FIELD_NAME.
 
 ```django
 <span id="something" class="your-class-1 your-class-2 {% editableitem "ELEMENT_NAME" "-1" "FIELD_NAME" "PLACEHOLDER" %}"></span>
 ```
-* `ELEMENT_NAME` is "what we are going to add"
+* `ELEMENT_NAME` is "what we are going to add" (a more appropriate name should be MODEL_NAME)
 * `-1` is the Primary Key of the element we are going to edit. `-1` means _add a new element_
 * `FIELD_NAME` is the field in which we'll put content inserted in the span element
 * `PLACEHOLDER` is a placeholder text to display where there is not text in the span
