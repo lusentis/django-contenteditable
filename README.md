@@ -8,7 +8,7 @@ With django-contenteditable you can create simple and easy to use admin interfac
 ## Current status ##
 **You should wait a few days until I complete this documentation (expecially views doc).**
 
-I'm using this app in many of my projects (I work at http://www.monkeytrip.it) and it works just fine!
+I'm using this app in many of my projects and it works just fine!
 
 ## What can django-contenteditable do ##
 Currently, django-contenteditable supports:
