@@ -33,6 +33,8 @@ Currently, django-contenteditable supports:
 Currently we don't check if a user has editable rights when parsing template tags, so the only security is that `$.post` calls fail because of the `@require_login` decorator you **must** put in contenteditable's views.
 In the next few days I'll fix this.
 
+CSRF protection is not implemented yet, so contenteditable views must use the `@csrf_exempt` decorator.
+
 ## Bugs ##
 File uploads are handled as follows:
 
@@ -229,11 +231,12 @@ Insert the uploader's JavaScript
 Now that you have generated the client-side code you should write some Python code.
 
 ### The `content_update` View ###
-**The logic:** every time an `editableitem` or `editalbeattr` is blurred contenteditable makes an AJAX post call that sends to `/contenteditable/update/` this data:
+**The logic:** every time an `editableitem` or `editalbeattr` is blurred, contenteditable makes an AJAX post call that sends to `/contenteditable/update/` this data:
 
 - The name of the element to be saved (a.k.a. the Model)
 - The id of the element to be saved (or -1 if not existant)
 - The data that is to be saved
+
 So, if the user edits the text of the article with pk=3 we ajax-post to `/contenteditable/update/` this data:
 
 ```
@@ -245,14 +248,77 @@ title	Article title
 
 The receiving view (**you must write it**) should:
 
-- Check if the model exists
-- Get the object identified by that pk or create a new one if pk == -1
-- Set the attributes with the received data
-- Save the object
+1. Check if the model exists
+2. Get the object identified by that pk or create a new one if pk == -1
+3. Set the attributes with the received data
+4. Save the object
 
+The simplest way to do this is to use the `content_update` method provided in `contenteditable.utils` 
+that takes care of steps 2, 3, 4 above.
+Here is a working example of `update_view` in `contenteditable/views.py`:
 
+```python
+@csrf_exempt
+@require_POST
+@login_required
+def update_view(request):
+	if request.POST.get('model')=='article':
+		if not content_update(Article, 
+				pk=request.POST.get('id').strip(),
+				title=request.POST.get('title'),
+				text=request.POST.get('text')):
+			return HttpResponseServerError('Content cannot be updated')
+	else:
+		raise ValueError('Unknown model: {0}'.format(request.POST.get('model')))
 
+	return HttpResponse('ok');
+```
 
+#### Where should i put this view? ####
+If you included `contenteditable.urls` like described in the Setup section, you must put your `update_view` and `delete_view` in the contenteditable app folder. If you whish to place it somewhere else just insert these lines in your root `urls.py`, instead of `include(contenteditable.urls)`:
+
+```python
+url(r'update/$', 'path.to.your.views.update_view'),
+url(r'delete/$', 'path.to.your.views.delete_view'),
+```
+
+### The `content_delete` View ###
+**The logic:** every time a `deletebutton` is clicked, contenteditable makes an AJAX post call that sends to `/contenteditable/delete/` this data:
+
+- The name of the element to be deleted (a.k.a. the Model)
+- The id of the element to be deleted
+
+Again, here is a working example of `delete_view` that uses the `content_delete` method from `contenteditable.utils`:
+
+```python
+@csrf_exempt
+@require_POST
+@login_required
+def delete_view(request):
+	if request.POST.get('model')=='article':
+		if not content_delete(Article, pk=request.POST.get('id').strip()):
+			return HttpResponseServerError('Delete failed')
+	else:
+		raise ValueError('Unknown model: {0}'.format(request.POST.get('model')))
+
+	return HttpResponse('ok')
+```
+
+## Example ##
+A working example is in the sample folder of this repo.
+
+**To run the example:**
+
+1. Clone this repo
+2. `cd django-contenteditable/sample`
+3. `python manage.py runserver`
+4. Point your browser (Firefox or Chrome) to http://127.0.0.1:8000
+
+## Demo ##
+Coming soon...
+
+## Debugging ##
+If something it's not working I suggest to debug using Firebug's Console Panel (http://getfirebug.com/).
 
 ## Tag Reference ##
 Coming soon...
