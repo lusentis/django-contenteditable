@@ -92,7 +92,7 @@ Nothing is magic, for getting things work you must:
 
 ```python
 urlpatterns += ('',
-	(r'contenteditable/(.*)$', include('contenteditable.urls')),
+	url(r'^contenteditable/', include('contenteditable.urls')),
 )
 ```
 4.    Run `./manage.py collectstatic` and include jQuery and `contenteditable.js` in your base template
