@@ -87,14 +87,15 @@ urlpatterns += ('',
 ```
 
 ### Templates ###
-Generally, you should only add a {% editablesomething... %} tag in the `class` attribute of an HTML element (I suggest using inline elements like `span`s).
-You **must not** use input elements with these tags, it won't work.
-Remember that HTML only allows **one** `class="..."` attribute, so this code won't work:
+In most of the cases you should only add a `{% editablesomething... %}` tag in the `class` attribute of an HTML element (I suggest using inline elements like `span`s).
+
+- You **must not** use input elements with these tags, it won't work.
+- Remember that HTML only allows **one** `class="..."` attribute, so this code won't work:
 
 ```django
 <span id="something" class="your-class-1 your-class-2" class="{% editablefoo "bar" "baz" %}"></span>
 ```
-Other attributes (id, style,...) usually doesn't influence the behaviour of django-contenteditable, but it may override your onclick, onfocus, onblur and onchange events.
+- Other attributes (id, style,...) usually doesn't influence the behaviour of django-contenteditable, but it may override your onclick, onfocus, onblur and onchange events.
 
 #### Adding a _insert something and press enter_ field ####
 
@@ -109,6 +110,7 @@ Other attributes (id, style,...) usually doesn't influence the behaviour of djan
 #### Adding an edit form with multiple fields ####
 Suppose we are in a page that displays a full news article.
 With this code you can make title, author and the whole article editable.
+
 ```django
 <div class="newsarticle {% editablebox "news" news.pk %}">
 	<div class="article-date">{{ news.date|date:'F Y' }}</div>
@@ -118,14 +120,60 @@ With this code you can make title, author and the whole article editable.
 	<p class="newstext {% editableattr "text" "Insert news text here..." %}" style="height:auto;">
 		{{ rubrica.text|safe }} 
 	</p>
-	<p class="author"><b>Autore:</b>
-		<span class="{% editableattr "autore" "Insert the author..." %}">
+	<p class="author"><b>Author:</b>
+		<span class="{% editableattr "author" "Insert the author..." %}">
 			{{ news.author }}
 		</span>
 	</p>
 </div>
 ```
 
+See _Tag Reference_ below for full documentation.
 
 
+#### Adding a delete button ####
+
+```django
+<a href="#" title="Click to delete this item" class="{% deletebutton "news" news.pk %}">
+	<img src="{{ STATIC_URL }}your-icon-folder/delete.png" width="15" height="15">
+</a>
+```
+The `<a>` tag is used only to get a cursor: pointer; automagically.
+
+
+#### Adding a Drag-n-Drop File Uploader ####
+You need a bit of javascript to define:
+
+- where to POST uploaded files
+- where to display file list with progress bars
+- what to do when a file is submitted
+- what to do when a file upload is complete
+
+In this example when all uploads are completed we display a message and refresh the page.
+To avoid writing more code you should not change names beginning with $.
+
+```django
+<div id="uploaderlist"></div>
+<div id="droparea" class="droparea-class"></div>
+...
+<script type="text/javascript">
+	var $uploaderAction = "/gallery/upload/{{ album.pk }}/";	// where to submit files
+	var $listElement = document.getElementById('uploaderlist');	// jQuery $(...) does not work
+	var uploadCount = 0;	// upload counter
+	var $uploadSubmitCallback = function() {
+		uploadCount++;
+	}
+	var $uploadSuccessCallback = function() {
+		uploadCount--;
+		if (uploadCount==0) {
+			alert('All files have been uploaded. Press OK to continue...');
+			setTimeout(reloadPage, 500);	// Wait just to be sure all AJAX calls are complete
+		}
+	}
+</script>
+
+{% insert_uploader "droparea" "this-is-actually-not-used-but-required" %}
+```
+
+## Tag Reference ##
 
