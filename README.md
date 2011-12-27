@@ -16,9 +16,9 @@ Currently, django-contenteditable supports:
 1.    Adding multi-field content
 2.    Adding single field content
 3.    Editing multi-field content
-4.    One-click editing (checking a single field, etc...)
+4.    One-click editing (checking a single field, etc...) ** work in progress **
 5.    Deleting content
-6.    Multiple uploading of images and documents via DnD and File API.
+6.    Multiple uploading of images and documents via DnD and File API (limited to one uploader per page)
 
 ## Requirements ##
 - Django
@@ -30,7 +30,7 @@ Currently, django-contenteditable supports:
 - The other features should work on any browser supported by jQuery that can do XMLHttpRequest.
 
 ## Security ##
-Currently we don't check if a user has editable rights when parsing template tags, so the only security is that $.post calls fails because of the @require_login decorator you **must** put in contenteditable's views.
+Currently we don't check if a user has editable rights when parsing template tags, so the only security is that `$.post` calls fail because of the @require_login decorator you **must** put in contenteditable's views.
 In the next few days I'll fix this.
 
 ## Bugs ##
@@ -62,10 +62,28 @@ class _StrChunk():
 		return self.data
 ```
 
+### Saving an image from POST data ###
+_views.py_
+```python
+	""" 
+		class MyImageModel(models.Model):
+			media = models.FileField(upload_to='my-upload-dir/')
+			...
+	"""
+	i = MyImageModel.objects.create()
+	i.media.save('{filename}.jpg'.format(filename=request.GET.get('filename')), _StrChunk(request.raw_post_data), True)
+	i.save()
+```
+
 
 In a near future this will be implemented via XMLHttpRequest2 (see http://www.w3.org/TR/XMLHttpRequest2/).
 
-## How To ##
+## Getting Started ##
+Nothing is magic, for getting things work you must:
+
+1.	Setup this app (**simple**)
+2. 	Write handler views (**simple**)
+3.	Insert tags in your template files (**very simple**, usually you don't need to write any HTML more than what you already have to display your content)
 
 ### Setup ###
 1.    Clone/download/install `django-contenteditable` and add `contenteditable` to your `INSTALLED_APPS` setting
