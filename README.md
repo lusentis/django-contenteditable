@@ -5,6 +5,11 @@ Contenteditable is supported by all non-mobile browsers, including Internet Expl
 
 With django-contenteditable you can create simple and easy to use admin interfaces to allow your human users to edit/add/delete contents directly where they view them, without a backend site (e.g.: django.contrib.admin).
 
+## Current status ##
+**You should wait a few days until I complete this documentation (expecially views doc).**
+
+I'm using this app in many of my projects (I work at http://www.monkeytrip.it) and it works just fine!
+
 ## What can django-contenteditable do ##
 Currently, django-contenteditable supports:
 
@@ -150,13 +155,27 @@ You need a bit of javascript to define:
 - what to do when a file upload is complete
 
 In this example when all uploads are completed we display a message and refresh the page.
-To avoid writing more code you should not change names beginning with $.
+To avoid writing more code and to be implementation-independent (currently uses qqFileUploader but in the future this will change) you should not change names beginning with `$`.
+
+At the top of the template load the `fileuploader` tag library:
 
 ```django
-<div id="uploaderlist"></div>
-<div id="droparea" class="droparea-class"></div>
+{% load fileuploader %}
+```
+
+In `<head>` include `fileuploader.js` and, if you like, `fileuploader.css`:
+
+```html
+<script type="text/javascript" src="{{ STATIC_URL }}_js/fileuploader.js"></script>
+<link rel="stylesheet" type="text/css" src="{{ STATIC_URL }}_css/fileuploader.css" />
+```
+
+```django
+<div id="uploaderlist">File list will be displayed here</div>
+<div id="droparea">Files dropped in this area will be uploaded</div>
 ...
 <script type="text/javascript">
+	// You should define all of these vars
 	var $uploaderAction = "/gallery/upload/{{ album.pk }}/";	// where to submit files
 	var $listElement = document.getElementById('uploaderlist');	// jQuery $(...) does not work
 	var uploadCount = 0;	// upload counter
@@ -171,9 +190,12 @@ To avoid writing more code you should not change names beginning with $.
 		}
 	}
 </script>
-
-{% insert_uploader "droparea" "this-is-actually-not-used-but-required" %}
+{% insert_uploader "droparea" %}
+...
 ```
 
-## Tag Reference ##
+## Views ##
+Coming soon...
 
+## Tag Reference ##
+Coming soon...
