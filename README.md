@@ -226,6 +226,30 @@ Insert the uploader's JavaScript
 ```
 
 ## Views ##
+Now that you have generated the client-side code you should write some Python code.
+
+### The `content_update` View ###
+**The logic:** every time an `editableitem` or `editalbeattr` is blurred contenteditable makes an AJAX post call that sends to `/contenteditable/update/` this data:
+
+- The name of the element to be saved (a.k.a. the Model)
+- The id of the element to be saved (or -1 if not existant)
+- The data that is to be saved
+So, if the user edits the text of the article with pk=3 we ajax-post to `/contenteditable/update/` this data:
+
+```
+id	3
+model	article
+text	This is the new text<br>Foo Bar Baz.
+title	Article title
+```
+
+The receiving view (**you must write it**) should:
+
+- Check if the model exists
+- Get the object identified by that pk or create a new one if pk == -1
+- Set the attributes with the received data
+- Save the object
+
 
 
 
