@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+{% load inlineedit %}
+{% load url from future %}
+
+<h2>Articles</h2>
+
+{% for item in articles %}
+    <article>
+	<h3>{{ item.title|striptags }}</h3>
+	<p>{{ item.text|striptags|truncatewords:30 }}</p>
+	<p><a href="{% url "article_detail" article_id=item.pk %}">Read more...</a> or <a href="#" class="{% deletebutton "article" item.pk %}">delete</a></p>
+	<p>&nbsp;</p>
+    </article>
+{% empty %}
+	<p>No article inserted</p>
+{% endfor %}
+
+<div style="margin-top:20px; background-color:#aaffaa;">
+	<p>Adding a new article is very simple: <span class="{% editableitem "article" "-1" "title" "Insert article title and press enter..." %}"></span></p>
+</div>
+
+{% endblock %}

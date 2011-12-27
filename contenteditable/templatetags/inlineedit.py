@@ -98,7 +98,7 @@ def do_editableitem(parser, token):
 		tag_name, data_model, data_id, data_name, data_placeholder = token.split_contents()
 		return EditableItemTemplate(data_model, data_id, data_name, data_placeholder)
 	except ValueError:
-		raise template.TemplateSyntaxError("%r tag requires data_model, data_id, data_name, data_placeholder arguments" % toke.contents.split()[0])
+		raise template.TemplateSyntaxError("%r tag requires data_model, data_id, data_name, data_placeholder arguments" % token.contents.split()[0])
 
 class EditableItemTemplate(template.Node):
 	def __init__(self, data_model, data_id, data_name, data_placeholder):
