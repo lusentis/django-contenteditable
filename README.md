@@ -14,7 +14,7 @@ Currently, django-contenteditable supports:
 1.    Adding multi-field content
 2.    Adding single field content
 3.    Editing multi-field content
-4.    One-click editing (checking a single field, etc...) ** work in progress **
+4.    One-click editing (checking a single field, etc...) **work in progress**
 5.    Deleting content
 6.    Multiple uploading of images and documents via DnD and File API (limited to one uploader per page)
 
@@ -88,15 +88,17 @@ Nothing is magic, to get things working you have to:
 
 ### Install ###
 -	Stable version from PyPI: `sudo easy_install django-contenteditable`
--	Development version: `git clone https://github.com/lusentis/django-contenteditable/` and `sudo python setup.ph install`
+-	Development version from Git: `git clone https://github.com/lusentis/django-contenteditable/` and `sudo python setup.py install`
 
 ### Configure ###
 2.    Add `contenteditable` to your `INSTALLED_APPS` setting
 3.    Include contenteditable.urls in main `urls.py`
 
 ```python
-urlpatterns += ('',
+urlpatterns = ('',
+	...
 	url(r'^contenteditable/', include('contenteditable.urls')),
+	...
 )
 ```
 4.    Run `./manage.py collectstatic` and include jQuery and `contenteditable.js` in your base template
@@ -118,10 +120,15 @@ urlpatterns += ('',
 In most of the cases you should only add a `{% editablesomething... %}` tag in the `class` attribute of an HTML element (I suggest using inline elements like `span`s).
 
 - You **must not** use input elements with these tags, it won't work.
-- Remember that HTML only allows **one** `class="..."` attribute, so this code won't work:
+- Remember that HTML only allows **one** `class="..."` attribute, so **this code won't work**:
 
 ```django
-<span id="something" class="your-class-1 your-class-2" class="{% editablefoo "bar" "baz" %}"></span>
+<span id="something" class="this-is-wrong" class="{% editablefoo "bar" "baz" %}">DON'T DO THIS</span>
+```
+- If you need to specify some classes write them **before** the template tag. This is **wrong**:
+
+```django
+<span id="something" class="{% editablefoo "bar" "baz" %} this-is-wrong">DON'T DO THIS</span>
 ```
 - Other attributes (id, style,...) usually doesn't influence the behaviour of django-contenteditable, but it may override your onclick, onfocus, onblur and onchange events.
 
