@@ -1,7 +1,7 @@
 # Django contenteditable #
 
-With django-contenteditable you can easily create Django apps that use the powerful HTML contenteditable attribute.
-Contenteditable is supported by all mayor browsers, including Internet Explorer (see http://caniuse.com/#feat=contenteditable).
+With django-contenteditable you can easily create Django apps that use the powerful HTML `contenteditable` attribute.
+Contenteditable is supported by all non-mobile browsers, including Internet Explorer (see http://caniuse.com/#feat=contenteditable).
 
 With django-contenteditable you can create simple and easy to use admin interfaces to allow your users to edit/add/delete contents directly without a backend site (e.g.: django.contrib.admin).
 
