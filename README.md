@@ -1,3 +1,5 @@
+Download link: https://github.com/lusentis/django-contenteditable/zipball/master
+
 # Django contenteditable #
 
 With django-contenteditable you can easily create Django apps that use the powerful HTML `contenteditable` attribute.
