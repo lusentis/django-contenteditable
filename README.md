@@ -21,8 +21,8 @@ Currently, django-contenteditable supports:
 6.    Multiple uploading of images and documents via DnD and File API (limited to one uploader per page)
 
 ## Requirements ##
-- Django
-- jQuery (DOM APIs and $.post for AJAX Requests)
+- Django 1.3+
+- jQuery 1.7+ (DOM APIs and $.post for AJAX Requests)
 
 ## Limitations ##
 - File upload uses HTML5 DnD and File API, so its support is (currently) limited to Firefox and Chrome (see http://caniuse.com/#feat=dragndrop and http://caniuse.com/#feat=fileapi).
