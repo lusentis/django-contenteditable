@@ -6,9 +6,7 @@ Contenteditable is supported by all non-mobile browsers, including Internet Expl
 With django-contenteditable you can create simple and easy to use admin interfaces to allow your human users to edit/add/delete contents directly where they view them, without a backend site (e.g.: django.contrib.admin).
 
 ## Current status ##
-**You should wait a few days until I complete this documentation (expecially views doc).**
-
-I'm using this app in many of my projects and it works just fine!
+Something is still missing, but I'm using this app in many real-world production projects and it works just fine!
 
 ## What can django-contenteditable do ##
 Currently, django-contenteditable supports:
@@ -230,7 +228,7 @@ Insert the uploader's JavaScript
 ## Views ##
 Now that you have generated the client-side code you should write some Python code.
 
-### The `content_update` View ###
+### The `update_view` view ###
 **The logic:** every time an `editableitem` or `editalbeattr` is blurred, contenteditable makes an AJAX post call that sends to `/contenteditable/update/` this data:
 
 - The name of the element to be saved (a.k.a. the Model)
@@ -282,7 +280,36 @@ url(r'update/$', 'path.to.your.views.update_view'),
 url(r'delete/$', 'path.to.your.views.delete_view'),
 ```
 
-### The `content_delete` View ###
+#### Note on `content_update` and why you should not use it ####
+`contenteditable.utils.content_update` relies on `__setattr__` to set attribute values to passed parameters.
+This util method was written to speed up the initial testing and learning, but I think there are better ways to accomplish this.
+For example, you could write an `handle_update` method in each of your models that takes some keyword parameters and updates the corresponding object.
+Here is an example of a working and complete `handle_update` method:
+
+```python
+@staticmethod
+def handle_update(pk, categoria, titolo, testo, video):
+	if pk > 0:
+		l = get_object_or_404(Laboratorio, pk=pk)
+	else:
+		l = Laboratorio()
+
+	l.data = datetime.datetime.now()
+	if categoria:
+		l.categoria = categoria
+	if titolo:
+		l.titolo = titolo
+	if testo:
+		l.testo = testo
+	if video:
+		l.video = video
+
+	l.save()
+	return l.pk
+```
+This is the far better than using the `contenteditable.utils.content_update` method. Check out its code to see how it works.
+
+### The `delete_view` View ###
 **The logic:** every time a `deletebutton` is clicked, contenteditable makes an AJAX post call that sends to `/contenteditable/delete/` this data:
 
 - The name of the element to be deleted (a.k.a. the Model)
