@@ -86,8 +86,11 @@ Nothing is magic, to get things working you have to:
 2. 	Write handler views (**simple**)
 3.	Insert tags in your template files (**very simple**, usually you don't need to write any HTML more than what you already have to display your content)
 
-### Setup ###
-1.    Install `django-contenteditable` with `sudo easy_install django-contenteditable` (stable version) or clone this repo and `sudo python setup.ph install` (dev version)
+### Install ###
+-	Stable version from PyPI: `sudo easy_install django-contenteditable`
+-	Development version: `git clone https://github.com/lusentis/django-contenteditable/` and `sudo python setup.ph install`
+
+### Configure ###
 2.    Add `contenteditable` to your `INSTALLED_APPS` setting
 3.    Include contenteditable.urls in main `urls.py`
 
