@@ -7,6 +7,7 @@ With django-contenteditable you can create simple and easy to use admin interfac
 
 ## What can django-contenteditable do ##
 Currently, django-contenteditable supports:
+
 1.    Adding multi-field content
 2.    Adding single field content
 3.    Editing multi-field content
@@ -25,9 +26,11 @@ Currently, django-contenteditable supports:
 
 ## Bugs ##
 File uploads are handled as follows:
+
 1.    File is read with FileReader API
 2.    File content is stored in a JS variable
 3.    The JS variabile is POSTed via XMLHttpRequest
+
 To use the file as the content for a FileField or ImageField you will need a wrapper class that implements a (somewhat) fake .chunks() method.
 
 In a near future I will implement this via XMLHttpRequest2 (see http://www.w3.org/TR/XMLHttpRequest2/).
@@ -36,10 +39,8 @@ In a near future I will implement this via XMLHttpRequest2 (see http://www.w3.or
 1.    Clone/download/install django-contenteditable and add `contenteditable` to your `INSTALLED_APPS` setting
 2.    Include contenteditable urls
 ```
-
 urlpatterns += ('',
 	(r'contenteditable/(.*)$', include('contenteditable.urls')),
 )
-
 ```
 
