@@ -56,17 +56,18 @@ class _StrChunk():
 
 In a near future this will be implemented via XMLHttpRequest2 (see http://www.w3.org/TR/XMLHttpRequest2/).
 
-## Setup ##
-1.    Clone/download/install django-contenteditable and add `contenteditable` to your `INSTALLED_APPS` setting
-2.    Create an empty `contenteditableurls.py` file in your project directory
-3.    Include contenteditableurls in main urls.py
+## How To ##
+
+### Setup ###
+1.    Clone/download/install `django-contenteditable` and add `contenteditable` to your `INSTALLED_APPS` setting
+3.    Include contenteditable.urls in main `urls.py`
 
 ```python
 urlpatterns += ('',
-	(r'contenteditable/(.*)$', include('contenteditableurls')),
+	(r'contenteditable/(.*)$', include('contenteditable.urls')),
 )
 ```
-4.    Run `./manage.py collectstatic' and include `jQuery` and `contenteditable.js` in your base template
+4.    Run `./manage.py collectstatic` and include jQuery and `contenteditable.js` in your base template
 
 ```html
 <head>
@@ -80,3 +81,16 @@ urlpatterns += ('',
 ```django
 {% load inlineedit %}
 ```
+
+### Templates ###
+
+#### Adding an _insert something and press enter_ field
+
+```django
+<span id="something" class="your-class-1 your-class-2 {% editableitem "ELEMENT_NAME" "-1" "FIELD_NAME" "PLACEHOLDER" %}"></span>
+```
+* `ELEMENT_NAME` is "what we are going to add"
+* `-1` is the Primary Key of the element we are going to edit. `-1` means _add a new element_
+* `FIELD_NAME` is the field in which we'll put content inserted in the <span> element
+* `PLACEHOLDER` is a placeholder text to display where there is not text in the <span>
+
