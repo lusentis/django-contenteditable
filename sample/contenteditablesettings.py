@@ -3,6 +3,6 @@
 from newspaper.models import Article
 
 CONTENTEDITABLE_MODELS = {
-    'article': [Article, ['title', 'text']],
+    'article': (Article, ('title', 'text')),
 }
 
