@@ -4,3 +4,4 @@ dist/
 *.egg-info
 sample/database
 build/*
+sample/contenteditable
