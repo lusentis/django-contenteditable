@@ -3,3 +3,4 @@
 dist/
 *.egg-info
 sample/database
+build/*
