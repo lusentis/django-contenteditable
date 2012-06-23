@@ -8,3 +8,7 @@ class Article(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('article_detail', (), dict(pk=self.pk))
