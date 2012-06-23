@@ -20,13 +20,13 @@ $(function(){
     var app = $box.attr('data-editapp');
     var model = $box.attr('data-editmodel');
     var pk = $box.attr('data-editpk');
-    $box.find('.editable:not(.locked)').each(function (_, el) {
+    $box.find('[data-editfield]:not(.locked)').each(function (_, el) {
       var $editable = $(el);
       $editable.attr('contenteditable', 'true');
     }).on('blur', function() {
       save_data = {};
-      $box.find('.editable').each(function (_, el2) {
-        var name = $(el2).attr('data-name');
+      $box.find('[data-editfield]').each(function (_, el2) {
+        var name = $(el2).attr('data-editfield');
         if (name) {
           save_data[name] = el2.innerHTML;
         }
