@@ -9,35 +9,34 @@ $(function(){
     if ($(this).html() === '') {
       $(this).html($(this).attr('data-placeholder'));
     }
-  });
-  $('.clearonclick').each(function (_, el1){
+  }).each(function (_, el1){
     if ($(el1).html().trim() === '') {
       $(el1).html($(this).attr('data-placeholder'));
     }
   });
 
-  $('.editablebox').each(function (_, el) {
-    $(el).find('.editable:not(.locked)').each(function (_, el1) {
-      $(el1).attr('contenteditable', 'true');
-      $(el1).bind('blur', function() {
-        t = $(this);
-        save_data = {};
-
-        $(el).find('.editable').each(function (_, el2) {
-          $(el2).css({'2border':'1px dotted red !important'});
-          name = $(el2).attr('data-name');
-          if (name) {
-            save_data[name] = el2.innerHTML;
-          }
-        });
-
-        $contentEditable.save($(el).attr('data-model'), $(el).attr('data-id'), save_data, function(data) {
-          if ($(el).attr('data-id')=="-1") {
-            $(el).attr('data-id', data);
-          }
-        });
+  $('.editablebox').each(function(_, el) {
+    var $box = $(el);
+    var app = $box.attr('data-editapp');
+    var model = $box.attr('data-editmodel');
+    var pk = $box.attr('data-editpk');
+    $box.find('.editable:not(.locked)').each(function (_, el) {
+      var $editable = $(el);
+      $editable.attr('contenteditable', 'true');
+    }).on('blur', function() {
+      save_data = {};
+      $box.find('.editable').each(function (_, el2) {
+        var name = $(el2).attr('data-name');
+        if (name) {
+          save_data[name] = el2.innerHTML;
+        }
       });
-
+      $contentEditable.save(model, pk, save_data, function(data) {
+        if (pk == "-1") {
+          pk = data;
+          $box.attr('data-editpk', pk);
+        }
+      });
     });
   });
 
