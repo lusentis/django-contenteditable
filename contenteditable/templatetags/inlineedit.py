@@ -71,23 +71,9 @@ def editablebox(obj=None):
     return 'data-editapp={0} data-editmodel={1} data-editpk={2}'.format(*data)
 
 
-## EditableAttr
-@register.tag(name='editableattr')
-def do_insert_editableattr(parser, token):
-    try:
-        tag_name, data_name, data_placeholder = token.split_contents()
-        return EditableAttrTemplate(data_name, data_placeholder)
-    except ValueError:
-        raise template.TemplateSyntaxError("%r tag requires data_name and data_placeholder arguments" % token.contents.split()[0])
-
-
-class EditableAttrTemplate(template.Node):
-    def __init__(self, data_name, data_placeholder):
-        self.data_name = data_name
-        self.data_placeholder = data_placeholder
-
-    def render(self, context):
-        return """editable clearonclick\" data-name={0} data-placeholder={1} """.format(self.data_name, self.data_placeholder)
+@register.simple_tag
+def editableattr(name, placeholder=""):
+    return 'data-editfield="{0}" data-placeholder="{1}" '.format(name, placeholder)
 
 ## EditableItem
 @register.tag(name='editableitem')
