@@ -1,5 +1,7 @@
 from django import template
 
+from ..constants import EDITABLE_CLASS
+
 """
 Builds a beautiful file uploader in pure JS and HTML5
 Template tag requires two arguments
@@ -56,24 +58,18 @@ class InlineeditCssTemplate(template.Node):
         """
 
 ## EditableBox
-@register.tag(name='editablebox')
-def do_insert_editablebox(parser, token):
-    try:
-        tag_name, data_model, data_id = token.split_contents()
-        return EditableBoxTemplate(data_model, data_id)
-    except ValueError:
-        raise template.TemplateSyntaxError("%r tag requires data_model and data_id arguments" % token.contents.split()[0])
 
 
-class EditableBoxTemplate(template.Node):
-    def __init__(self, data_model, data_id):
-        self.data_model = data_model
-        self.data_id = template.Variable(data_id)
+@register.simple_tag
+def editablebox(obj=None):
+    if obj is None:
+        return EDITABLE_CLASS
+    data = (
+        obj._meta.app_label,
+        obj._meta.object_name.lower(),
+        obj.pk)
+    return 'data-editapp={0} data-editmodel={1} data-editpk={2}'.format(*data)
 
-    def render(self, context):
-        if not '{0}'.format(self.data_id).startswith('"'):
-            self.data_id = self.data_id.resolve(context)
-        return """editablebox\" data-model={0} data-id={1} """.format(self.data_model, self.data_id)
 
 ## EditableAttr
 @register.tag(name='editableattr')
