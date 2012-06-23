@@ -1,0 +1,1 @@
+EDITABLE_CLASS = 'editablebox'

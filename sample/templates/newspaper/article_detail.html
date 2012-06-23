@@ -6,9 +6,9 @@
 <p><a href="{% url "article_list" %}">Back to list</a></p>
 <p>Here is the article with pk={{ article.pk }}. Try editing title or text and refresh the page.</p>
 
-<article style="background-color:#eee;" class="{% editablebox "article" article.pk %}">
-	<h3 class="{% editableattr "title" "Insert article title here..." %}">{{ article.title|striptags }}</h3>
-	<p class="{% editableattr "text" "Insert article text here..." %}">{{ article.text|safe }}</p>
+<article style="background-color:#eee;" class="{% editablebox %}" {% editablebox article %}>
+	<h3 {% editableattr "title" "Insert article title here..." %}>{{ article.title|striptags }}</h3>
+	<p {% editableattr "text" "Insert article text here..." %}>{{ article.text|safe }}</p>
 </article>
 
 {% endblock %}
