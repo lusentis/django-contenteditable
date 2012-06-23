@@ -1,4 +1,10 @@
 # Django settings for sample project.
+import os
+
+
+def project_dir(*paths):
+    base = os.path.realpath(os.path.dirname(__file__))
+    return os.path.join(base, *paths)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -12,7 +18,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'database',                      # Or path to database file if using sqlite3.
+        'NAME': project_dir('database'),                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -56,7 +62,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/Users/simone.lusenti/Desktop/django-contenteditable/sample/static/'
+STATIC_ROOT = project_dir('static/')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -106,7 +112,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/Users/simone.lusenti/Desktop/django-contenteditable/sample/templates/',
+    project_dir('templates/'),
 )
 
 INSTALLED_APPS = (
