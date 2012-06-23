@@ -5,11 +5,11 @@
 
 <h2>Articles</h2>
 
-{% for item in articles %}
+{% for item in object_list %}
     <article>
 	<h3>{{ item.title|striptags }}</h3>
 	<p>{{ item.text|striptags|truncatewords:30 }}</p>
-	<p><a href="{% url "article_detail" article_id=item.pk %}">Read more...</a> or <a href="#" class="{% deletebutton "article" item.pk %}">delete</a></p>
+	<p><a href="{{ item.get_absolute_url }}">Read more...</a> or <a href="#" class="{% deletebutton "article" item.pk %}">delete</a></p>
 	<p>&nbsp;</p>
     </article>
 {% empty %}
