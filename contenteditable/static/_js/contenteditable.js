@@ -1,6 +1,27 @@
 // Content editable support
 
 $(function(){
+  // function saveEditbox
+  // this: the box element that contains all the editable elements
+  function saveEditbox(){
+    var $box = $(this);
+    var app = $box.attr('data-editapp');
+    var model = $box.attr('data-editmodel');
+    var pk = $box.attr('data-editpk');
+    save_data = {};
+    $box.find('[data-editfield]').each(function (_, el) {
+      var name = $(el).attr('data-editfield');
+      if (name) {
+        save_data[name] = el.innerHTML;
+      }
+    });
+    $contentEditable.save(model, pk, save_data, function(data) {
+      if (pk == "-1") {
+        $box.attr('data-editpk', pk);
+      }
+    });
+  }
+
   $('.clearonclick').click(function() {
     if ($(this).html()==$(this).attr('data-placeholder')) {
       $(this).html('');
@@ -15,29 +36,12 @@ $(function(){
     }
   });
 
-  $('.editablebox').each(function(_, el) {
-    var $box = $(el);
-    var app = $box.attr('data-editapp');
-    var model = $box.attr('data-editmodel');
-    var pk = $box.attr('data-editpk');
+  $('.editablebox').each(function(_, boxel) {
+    var $box = $(boxel);
     $box.find('[data-editfield]:not(.locked)').each(function (_, el) {
       var $editable = $(el);
       $editable.attr('contenteditable', 'true');
-    }).on('blur', function() {
-      save_data = {};
-      $box.find('[data-editfield]').each(function (_, el2) {
-        var name = $(el2).attr('data-editfield');
-        if (name) {
-          save_data[name] = el2.innerHTML;
-        }
-      });
-      $contentEditable.save(model, pk, save_data, function(data) {
-        if (pk == "-1") {
-          pk = data;
-          $box.attr('data-editpk', pk);
-        }
-      });
-    });
+    }).on('blur', function(evt){ saveEditbox.call(boxel, evt); });
   });
 
   $('.returnsaves').each(function (_, el) {
