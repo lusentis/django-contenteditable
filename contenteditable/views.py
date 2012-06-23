@@ -1,6 +1,5 @@
 from django.http import HttpResponse, HttpResponseServerError
 from django.contrib.auth.views import login_required
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from contenteditable.utils import content_update_from_dict, content_delete
@@ -8,7 +7,6 @@ from contenteditable.utils import content_update_from_dict, content_delete
 from contenteditablesettings import CONTENTEDITABLE_MODELS
 
 
-@csrf_exempt
 @require_POST
 #@login_required        ### UNCOMMENT THIS!
 def update_view(request):
@@ -23,7 +21,6 @@ def update_view(request):
         raise ValueError('Unknown model: {0}'.format(request.POST.get('model')))
 
 
-@csrf_exempt
 @require_POST
 #@login_required        ### UNCOMMENT THIS!
 def delete_view(request):
