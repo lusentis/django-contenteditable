@@ -7,7 +7,7 @@
 <p>Here is the article with pk={{ article.pk }}. Double-click to start editing. Try editing title or text and then refresh the page.</p>
 
 <article style="background-color:#eee;" {% editablebox article %}>
-	<h3 {% editableattr "title" "Insert article title here..." %}>{{ article.title|striptags }}</h3>
+	<h3>{% editable article "title" %}</h3>
 	<p {% editableattr "text" "Insert article text here..." %}>{{ article.text|safe }}</p>
 </article>
 

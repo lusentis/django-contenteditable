@@ -1,4 +1,6 @@
 from django import template
+from django.db.models import fields
+from django.utils.safestring import mark_safe
 
 """
 Builds a beautiful file uploader in pure JS and HTML5
@@ -10,6 +12,7 @@ Usage: {% insert_inlineedit_js container-id %}
 """
 
 register = template.Library()
+
 
 ## CSS
 @register.tag(name='insert_inlineedit_css')
@@ -55,9 +58,8 @@ class InlineeditCssTemplate(template.Node):
         </style>
         """
 
+
 ## EditableBox
-
-
 @register.simple_tag
 def editablebox(obj):
     data = (
@@ -70,6 +72,20 @@ def editablebox(obj):
 @register.simple_tag
 def editableattr(name, placeholder=""):
     return 'data-editfield="{0}" data-placeholder="{1}" '.format(name, placeholder)
+
+
+@register.simple_tag
+def editable(obj, fieldname):
+    try:
+        field = obj._meta.get_field(fieldname)
+    except fields.FieldDoesNotExist:
+        raise
+    attrs = ['data-editfield="%s"' % fieldname,
+             'data-placeholder="%s"' % (field.default if field.default != fields.NOT_PROVIDED else ''),
+             'data-editwidget="%s"' % field.__class__.__name__]
+    out = '<span %s>' % " ".join(attrs) + getattr(obj, fieldname) + '</span>'
+    return mark_safe(out)
+
 
 ## EditableItem
 @register.tag(name='editableitem')
@@ -96,6 +112,7 @@ class EditableItemTemplate(template.Node):
             self.data_model, self.data_id, self.data_name, self.data_placeholder
         )
 
+
 ## DeleteButton
 @register.tag(name='deletebutton')
 def do_deletebutton(parser, token):
@@ -103,7 +120,7 @@ def do_deletebutton(parser, token):
         tag_name, data_model, data_id = token.split_contents()
         return DeleteButtonTemplate(data_model, data_id)
     except ValueError:
-        raise template.TemplateSyntaxError("%r tag requires data_model, data_id arguments and data_id must resolve in context." % toke.contents.split()[0])
+        raise template.TemplateSyntaxError("%r tag requires data_model, data_id arguments and data_id must resolve in context." % token.contents.split()[0])
 
 
 class DeleteButtonTemplate(template.Node):
