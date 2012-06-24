@@ -1,7 +1,5 @@
 from django import template
 
-from ..constants import EDITABLE_CLASS
-
 """
 Builds a beautiful file uploader in pure JS and HTML5
 Template tag requires two arguments
@@ -61,9 +59,7 @@ class InlineeditCssTemplate(template.Node):
 
 
 @register.simple_tag
-def editablebox(obj=None):
-    if obj is None:
-        return EDITABLE_CLASS
+def editablebox(obj):
     data = (
         obj._meta.app_label,
         obj._meta.object_name.lower(),

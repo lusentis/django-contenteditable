@@ -66,7 +66,8 @@ $(function(){
     }
   });
 
-  $('.editablebox').on('dblclick', enableEditbox);
+  // not an efficient selector but makes this easier to implement in the templates
+  $('*[data-editpk]').addClass('ui-editbox').on('dblclick', enableEditbox);
 
   $('.returnsaves').each(function (_, el) {
     $(el).keypress(function(event) {

@@ -6,7 +6,7 @@
 <p><a href="{% url "article_list" %}">Back to list</a></p>
 <p>Here is the article with pk={{ article.pk }}. Double-click to start editing. Try editing title or text and then refresh the page.</p>
 
-<article style="background-color:#eee;" class="{% editablebox %}" {% editablebox article %}>
+<article style="background-color:#eee;" {% editablebox article %}>
 	<h3 {% editableattr "title" "Insert article title here..." %}>{{ article.title|striptags }}</h3>
 	<p {% editableattr "text" "Insert article text here..." %}>{{ article.text|safe }}</p>
 </article>

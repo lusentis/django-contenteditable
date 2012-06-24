@@ -1,1 +1,0 @@
-EDITABLE_CLASS = 'editablebox'
