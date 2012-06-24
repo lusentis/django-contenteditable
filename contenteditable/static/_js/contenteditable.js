@@ -1,6 +1,29 @@
 // Content editable support
 
 $(function(){
+  // function enableEditbox
+  // turns design mode on for editable elements
+  // this: the box element that contains all the editable elements
+  function enableEditbox(){
+    var self = this;
+    $(self).addClass('ui-editbox-active')
+    .find('[data-editfield]:not(.locked)')
+    .attr('contenteditable', 'true')
+    .off('.editbox')
+    .on('blur.editbox', function(evt){ saveEditbox.call(self, evt); });
+  }
+
+
+  // function disableEditbox
+  // turns design mode off for editable elements
+  // this: the box element that contains all the editable elements
+  function disableEditbox(){
+    $(this).removeClass('ui-editbox-active')
+    .find('[contentEditable]')
+    .removeAttr('contenteditable');
+  }
+
+
   // function saveEditbox
   // this: the box element that contains all the editable elements
   function saveEditbox(){
@@ -20,6 +43,7 @@ $(function(){
         $box.attr('data-editpk', pk);
       }
     });
+    disableEditbox.call(this);
   }
 
   $('.clearonclick').click(function() {
@@ -36,13 +60,7 @@ $(function(){
     }
   });
 
-  $('.editablebox').each(function(_, boxel) {
-    var $box = $(boxel);
-    $box.find('[data-editfield]:not(.locked)').each(function (_, el) {
-      var $editable = $(el);
-      $editable.attr('contenteditable', 'true');
-    }).on('blur', function(evt){ saveEditbox.call(boxel, evt); });
-  });
+  $('.editablebox').on('dblclick', enableEditbox);
 
   $('.returnsaves').each(function (_, el) {
     $(el).keypress(function(event) {
