@@ -19,6 +19,12 @@
 </style>
 <body>
 <div id="container">
+	{% if user.is_authenticated %}
+		{{ user }}
+		<a href="{% url logout %}">logout</a>
+	{% else %}
+		<a href="{% url login %}">login</a>
+	{% endif %}
 	<header>
 		<h1>Django-contenteditable Demo</h1>
 	</header>
