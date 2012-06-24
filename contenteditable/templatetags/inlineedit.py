@@ -79,9 +79,10 @@ def do_editable(parser, token):
     try:
         tag_name, field = token.split_contents()
         objname, fieldname = field.split('.')
-    except ValueError:
-        # TODO
-        raise
+    except ValueError as e:
+        raise template.TemplateSyntaxError("editable tag expects one argument "
+            "formatted like `object.field`, "
+            "%s" % e)
     return EditableModelFieldNode(objname, fieldname)
 
 
@@ -95,10 +96,8 @@ class EditableModelFieldNode(template.Node):
             obj = self.objname.resolve(context)
             fieldname = self.fieldname
             field = obj._meta.get_field(fieldname)
-        except template.VariableDoesNotExist:
+        except (template.VariableDoesNotExist, fields.FieldDoesNotExist):
             return ''
-        except fields.FieldDoesNotExist:
-            raise
         attrs = ['data-editfield="%s"' % fieldname,
                  'data-placeholder="%s"' % (field.default if field.default != fields.NOT_PROVIDED else ''),
                  'data-editwidget="%s"' % field.__class__.__name__]
