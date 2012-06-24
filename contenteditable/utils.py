@@ -18,7 +18,7 @@ def content_update_from_dict(Model, source_dict, keys):
     for k in keys:
         if k == 'pk':
             continue  # don't set pkeys
-        if source_dict[k] is None:
+        if k not in source_dict:
             continue  # don't set if not passed
 
         try:
