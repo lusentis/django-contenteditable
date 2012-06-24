@@ -74,17 +74,36 @@ def editableattr(name, placeholder=""):
     return 'data-editfield="{0}" data-placeholder="{1}" '.format(name, placeholder)
 
 
-@register.simple_tag
-def editable(obj, fieldname):
+@register.tag(name='editable')
+def do_editable(parser, token):
     try:
-        field = obj._meta.get_field(fieldname)
-    except fields.FieldDoesNotExist:
+        tag_name, field = token.split_contents()
+        objname, fieldname = field.split('.')
+    except ValueError:
+        # TODO
         raise
-    attrs = ['data-editfield="%s"' % fieldname,
-             'data-placeholder="%s"' % (field.default if field.default != fields.NOT_PROVIDED else ''),
-             'data-editwidget="%s"' % field.__class__.__name__]
-    out = '<span %s>' % " ".join(attrs) + getattr(obj, fieldname) + '</span>'
-    return mark_safe(out)
+    return EditableModelFieldNode(objname, fieldname)
+
+
+class EditableModelFieldNode(template.Node):
+    def __init__(self, objname, fieldname):
+        self.objname = template.Variable(objname)
+        self.fieldname = fieldname
+
+    def render(self, context):
+        try:
+            obj = self.objname.resolve(context)
+            fieldname = self.fieldname
+            field = obj._meta.get_field(fieldname)
+        except template.VariableDoesNotExist:
+            return ''
+        except fields.FieldDoesNotExist:
+            raise
+        attrs = ['data-editfield="%s"' % fieldname,
+                 'data-placeholder="%s"' % (field.default if field.default != fields.NOT_PROVIDED else ''),
+                 'data-editwidget="%s"' % field.__class__.__name__]
+        out = '<span %s>' % " ".join(attrs) + getattr(obj, fieldname) + '</span>'
+        return mark_safe(out)
 
 
 ## EditableItem
