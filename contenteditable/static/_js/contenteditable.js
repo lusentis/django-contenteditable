@@ -9,8 +9,14 @@ $(function(){
     $(self).addClass('ui-editbox-active')
     .find('[data-editfield]:not(.locked)')
     .attr('contenteditable', 'true')
-    .off('.editbox')
-    .on('blur.editbox', function(evt){ saveEditbox.call(self, evt); });
+    .off('.editbox');
+    // FIXME remove hack once we get real ui for determining when we're done
+    $(document).on('click.editbox', function(evt){
+      if (!$(evt.target).closest('.ui-editbox-active').length) {
+        saveEditbox.call(self, evt);
+        $(document).off('.editbox');
+      }
+    });
   }
 
 
