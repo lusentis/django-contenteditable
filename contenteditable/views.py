@@ -13,14 +13,16 @@ class UpdateView(View):
 
     def post(self, request, *args, **kwargs):
         model = request.POST.get('model')
-        if CONTENTEDITABLE_MODELS.get(model) is not None:
-            e_conf = CONTENTEDITABLE_MODELS[model]
-            if content_update_from_dict(e_conf[0], request.POST, e_conf[1]):
-                return HttpResponse('ok')
-            else:
-                return HttpResponseServerError('Content cannot be updated')
-        else:
+        if CONTENTEDITABLE_MODELS.get(model) is None:
             raise ValueError('Unknown model: {0}'.format(request.POST.get('model')))
+        if not request.user.has_perm(model):
+            # TODO
+            return HttpResponseServerError('User does not have permission')
+        e_conf = CONTENTEDITABLE_MODELS[model]
+        if content_update_from_dict(e_conf[0], request.POST, e_conf[1]):
+            return HttpResponse('ok')
+        else:
+            return HttpResponseServerError('Content cannot be updated')
 
 
 @require_POST
