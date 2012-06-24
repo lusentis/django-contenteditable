@@ -1,0 +1,5 @@
+/* Default contenteditable css */
+
+.ui-editbox-active {
+  outline: 2000em solid rgba(0, 0, 0, 0.5);
+}
