@@ -1,4 +1,6 @@
-from django.http import HttpResponse, HttpResponseServerError
+import json
+
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.contrib.auth.views import login_required
 from django.views.decorators.http import require_POST
 from django.views.generic import View
@@ -16,13 +18,18 @@ class UpdateView(View):
         if CONTENTEDITABLE_MODELS.get(model) is None:
             raise ValueError('Unknown model: {0}'.format(request.POST.get('model')))
         if not request.user.has_perm(model):
-            # TODO
-            return HttpResponseServerError('User does not have permission')
+            return HttpResponseForbidden(
+                json.dumps(dict(message='User does not have permission')),
+                content_type='application/json')
         e_conf = CONTENTEDITABLE_MODELS[model]
         if content_update_from_dict(e_conf[0], request.POST, e_conf[1]):
-            return HttpResponse('ok')
+            return HttpResponse(
+                json.dumps(dict(message='ok')),
+                content_type='application/json')
         else:
-            return HttpResponseServerError('Content cannot be updated')
+            return HttpResponseBadRequest(
+                json.dumps(dict(message='Content cannot be updated')),
+                content_type='application/json')
 
 
 @require_POST
