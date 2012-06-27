@@ -8,12 +8,19 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}_css/contenteditable.css" />
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}_css/style.css" />
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}_js/contenteditable.js"></script>
 </head>
 <body>
 <div id="container">
+	{% if user.is_authenticated %}
+		{{ user }}
+		<a href="{% url logout %}">logout</a>
+	{% else %}
+		<a href="{% url login %}">login</a>
+	{% endif %}
 	<header>
 		<h1>Django-contenteditable Demo</h1>
 	</header>

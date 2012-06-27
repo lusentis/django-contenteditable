@@ -1,7 +1,7 @@
+*.egg-info
 *.pyc
 *.swp
-dist/
-*.egg-info
-sample/database
 build/*
+dist/
+sample/*.sqlite
 sample/contenteditable
