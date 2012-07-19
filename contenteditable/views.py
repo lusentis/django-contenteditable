@@ -30,8 +30,9 @@ class UpdateView(View, SingleObjectMixin):
             self.slug_field = data.pop('slugfield')
         self.kwargs.update(data)
         obj = self.get_object()
-        for k in e_conf[1]:
-            obj.__setattr__(k, data.pop(k))
+        for fieldname in e_conf[1]:
+            if fieldname in data:
+                obj.__setattr__(fieldname, data.pop(fieldname))
         obj.save()  # TODO only save if changed
         return HttpResponse(
             json.dumps(dict(message='ok')),
