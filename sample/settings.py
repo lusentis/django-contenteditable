@@ -150,3 +150,11 @@ LOGGING = {
         },
     }
 }
+
+
+# define models and their fields that are allowed to be edited
+# you must opt-in and explicitly allow each model and field
+CONTENTEDITABLE_MODELS = (
+    ('newspaper.article', ('title', 'text')),
+    ('chunks.chunk', ('content',)),
+)
