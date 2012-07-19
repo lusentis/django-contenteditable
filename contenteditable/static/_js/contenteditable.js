@@ -5,15 +5,31 @@ $(function(){
   // turns design mode on for editable elements
   // this: the box element that contains all the editable elements
   function enableEditbox(){
-    var self = this;
-    $(self).addClass('ui-editbox-active')
-    .find('[data-editfield]:not(.locked)')
-    .attr('contenteditable', 'true')
-    .off('.editbox');
+    var self = this,
+        $box = $(self),
+        data = $box.data();
+    $box.addClass('ui-editbox-active');
+    var editables = $box.find('[data-editfield]:not(.locked)');
+    if (editables.length){
+      editables
+      .attr('contenteditable', 'true')
+      .off('.editbox');
+    } else if (data.editfield) {
+      $box
+      .attr('contenteditable', 'true')
+      .off('.editbox');
+    } else {
+      throw "nothingToEdit";
+    }
     // FIXME remove hack once we get real ui for determining when we're done
     $(document).on('click.editbox', function(evt){
       if (!$(evt.target).closest('.ui-editbox-active').length) {
-        saveEditbox.call(self, evt);
+        try {
+          saveEditbox.call(self, evt);
+        } catch (e){
+          disableEditbox.call(self);
+          console.warn(e);
+        }
         $(document).off('.editbox');
       }
     });
@@ -33,22 +49,43 @@ $(function(){
   // function saveEditbox
   // this: the box element that contains all the editable elements
   function saveEditbox(){
-    var $box = $(this);
-    var app = $box.attr('data-editapp');
-    var model = $box.attr('data-editmodel');
-    var pk = $box.attr('data-editpk');
-    save_data = {};
-    $box.find('[data-editfield]').each(function (_, el) {
-      var name = $(el).attr('data-editfield');
-      if (name) {
-        save_data[name] = el.innerHTML;
+    var $box = $(this),
+        data = $box.data(),
+        pk = data.editpk,
+        save_data = {};
+    if (!data.editmodel){
+      throw "missingModel";
+    }
+    if (pk){
+      save_data.pk = pk;
+    } else if (data.editslug) {
+      save_data.slug = data.editslug;
+      if (data.editslugfield){
+        save_data.slugfield = data.editslugfield;
       }
-    });
-    $contentEditable.save(model, pk, save_data, function(data) {
-      if (pk == "-1") {
-        $box.attr('data-editpk', pk);
-      }
-    });
+    } else {
+      throw "missingPK";
+    }
+    var editables = $box.find('[data-editfield]');
+    if (editables.length) {
+      editables.each(function (_, el) {
+        var name = $(el).attr('data-editfield');
+        if (name) {
+          save_data[name] = el.innerHTML;
+        }
+      });
+    } else if (data.editfield) {
+      save_data[data.editfield] = $.trim($box.html());
+    } else {
+      throw "missingData";
+    }
+    if (pk !== -1) {
+      $contentEditable.save(data.editmodel, save_data);
+    } else {
+      $contentEditable.insert(data.editmodel, save_data, function(data) {
+        $box.attr('data-editpk', data.pk);
+      });
+    }
     disableEditbox.call(this);
   }
 
@@ -67,7 +104,7 @@ $(function(){
   });
 
   // not an efficient selector but makes this easier to implement in the templates
-  $('*[data-editpk]').addClass('ui-editbox').on('dblclick', enableEditbox);
+  $('[data-editpk], [data-editslug]').addClass('ui-editbox').on('dblclick', enableEditbox);
 
   $('.returnsaves').each(function (_, el) {
     $(el).keypress(function(event) {
@@ -172,16 +209,39 @@ $contentEditable = {
   init: function (options) {
     jQuery.extend($contentEditable.options, options);
   },
-  save: function(model, id, data, success_callback) {
+  save: function(model, data, success_callback) {
     console.log("Saving to "+$contentEditable.options['url']);
     console.log(data);
 
-    $.post($contentEditable.options['url'], jQuery.extend(data, {
-      'model': model,
-      'id': id
-    }))
+    $.ajax({
+      type: 'POST',
+      url: $contentEditable.options.url,
+      data: jQuery.extend(data, {
+        'model': model
+      }),
+      dataType: 'json',
+    })
     .success(function(response) {
-      console.log("Saved: "+response);
+      console.log("Saved: ", response);
+    })
+    .success(success_callback)
+    .error(function() {
+      alert("Si è verificato un errore durante il salvataggio. Le modifiche potrebbero non essere state salvate.\nSe il problema persiste ricarica la pagina.");
+    });
+  },
+  insert: function(model, data, success_callback){
+    console.log("Inserting to " + $contentEditable.options['url']);
+    console.log(data);
+    $.ajax({
+      type: 'PUT',
+      url: $contentEditable.options.url,
+      data: jQuery.extend(data, {
+        'model': model
+      }),
+      dataType: 'json'
+    })
+    .success(function(response) {
+      console.log("Inserted: ", response);
     })
     .success(success_callback)
     .error(function() {
@@ -195,7 +255,7 @@ $contentEditable = {
       'id': id
     })
     .success(function(response) {
-      console.log("Deleted: "+response);
+      console.log("Deleted: ", response);
       document.location.reload();
     })
     .error(function() {
