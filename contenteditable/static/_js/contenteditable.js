@@ -68,11 +68,13 @@ $(function(){
     } else {
       throw "missingData";
     }
-    $contentEditable.save(data.editmodel, save_data, function(data) {
-      if (pk == "-1") {
-        $box.attr('data-editpk', pk);
-      }
-    });
+    if (pk !== -1) {
+      $contentEditable.save(data.editmodel, save_data);
+    } else {
+      $contentEditable.insert(data.editmodel, save_data, function(data) {
+        $box.attr('data-editpk', data.pk);
+      });
+    }
     disableEditbox.call(this);
   }
 
@@ -205,6 +207,25 @@ $contentEditable = {
     }))
     .success(function(response) {
       console.log("Saved: "+response);
+    })
+    .success(success_callback)
+    .error(function() {
+      alert("Si è verificato un errore durante il salvataggio. Le modifiche potrebbero non essere state salvate.\nSe il problema persiste ricarica la pagina.");
+    });
+  },
+  insert: function(model, data, success_callback){
+    console.log("Inserting to " + $contentEditable.options['url']);
+    console.log(data);
+    $.ajax({
+      type: 'PUT',
+      url: $contentEditable.options.url,
+      data: jQuery.extend(data, {
+        'model': model
+      }),
+      dataType: 'json'
+    })
+    .success(function(response) {
+      console.log("Saved: " + response);
     })
     .success(success_callback)
     .error(function() {

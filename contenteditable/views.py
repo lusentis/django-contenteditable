@@ -6,7 +6,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 
-from contenteditable.utils import content_update_from_dict, content_delete
+from contenteditable.utils import content_delete
 
 from contenteditablesettings import CONTENTEDITABLE_MODELS
 
@@ -42,7 +42,24 @@ class UpdateView(View, SingleObjectMixin):
         #         content_type='application/json')
 
     def put(self, request, *args, **kwargs):
-        # TODO
+        # TODO test this
+        data = request.POST.dict().copy()
+        model = data.pop('model')
+        e_conf = CONTENTEDITABLE_MODELS[model]
+        model = e_conf[0]
+        obj_data = {}
+        if 'slugfield' in data:
+            # inserting stuff that uses slugs probably won't work unless the
+            # slug is one of the editable attributes
+            slug_field = data.pop('slugfield')
+            obj_data[slug_field] = data.pop('slug')
+        for k in e_conf[1]:
+            if k in data:
+                obj_data[k] = data.pop(k)
+        obj = model.objects.create(**obj_data)
+        return HttpResponse(
+            json.dumps(dict(message='ok', pk=obj.pk)),
+            content_type='application/json')
         pass
 
 
