@@ -46,7 +46,7 @@ $(function(){
       throw "missingModel";
     }
     if (pk){
-      save_data.id = pk;
+      save_data.pk = pk;
     } else if (data.editslug) {
       save_data.slug = data.editslug;
       if (data.editslugfield){
