@@ -1,18 +1,26 @@
 [
   {
-    "pk": 1, 
-    "model": "newspaper.article", 
+    "pk": 1,
+    "model": "newspaper.article",
     "fields": {
-      "text": "this ise text<br>", 
+      "text": "this ise text<br>",
       "title": "This is the title"
     }
-  }, 
+  },
   {
-    "pk": 3, 
-    "model": "newspaper.article", 
+    "pk": 2,
+    "model": "newspaper.article",
     "fields": {
-      "text": "This is the new text<br>", 
+      "text": "This is the new text<br>",
       "title": "Article titlssssesdfgsdfgsfg"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "chunks.chunk",
+    "fields": {
+      "content": "Welcome, I am a Chunk!",
+      "key": "intro"
     }
   }
 ]

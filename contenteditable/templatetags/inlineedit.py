@@ -96,6 +96,19 @@ class EditableItemTemplate(template.Node):
             self.data_model, self.data_id, self.data_name, self.data_placeholder
         )
 
+try:
+    import chunks  # only expose if chunks is installed
+
+    @register.simple_tag
+    def editablechunk(key):
+        return ('data-editapp="chunks" data-editmodel="chunk" '
+                'data-editslugfield="key"'
+                'data-editfield="content" data-editslug="%s"') % key
+
+except ImportError:
+    pass
+
+
 ## DeleteButton
 @register.tag(name='deletebutton')
 def do_deletebutton(parser, token):
