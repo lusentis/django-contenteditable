@@ -202,11 +202,16 @@ $contentEditable = {
     console.log("Saving to "+$contentEditable.options['url']);
     console.log(data);
 
-    $.post($contentEditable.options['url'], jQuery.extend(data, {
-      'model': model
-    }))
+    $.ajax({
+      type: 'POST',
+      url: $contentEditable.options.url,
+      data: jQuery.extend(data, {
+        'model': model
+      }),
+      dataType: 'json',
+    })
     .success(function(response) {
-      console.log("Saved: "+response);
+      console.log("Saved: ", response);
     })
     .success(success_callback)
     .error(function() {
@@ -225,7 +230,7 @@ $contentEditable = {
       dataType: 'json'
     })
     .success(function(response) {
-      console.log("Saved: " + response);
+      console.log("Inserted: ", response);
     })
     .success(success_callback)
     .error(function() {
@@ -239,7 +244,7 @@ $contentEditable = {
       'id': id
     })
     .success(function(response) {
-      console.log("Deleted: "+response);
+      console.log("Deleted: ", response);
       document.location.reload();
     })
     .error(function() {
