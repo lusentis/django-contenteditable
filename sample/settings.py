@@ -152,6 +152,11 @@ LOGGING = {
 }
 
 
+# to enable or disable contenteditable functionality. affects the
+# templatetags and the views. You may not want this enabled in production
+# because of caching and exposing primary keys.
+CONTENTEDITABLE_ENABLED = False
+
 # define models and their fields that are allowed to be edited
 # you must opt-in and explicitly allow each model and field
 CONTENTEDITABLE_MODELS = (
