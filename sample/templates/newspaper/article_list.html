@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-{% load inlineedit %}
+{% load inlineedit chunks %}
 {% load url from future %}
+
+<p>
+{% chunk "intro" %}
+</p>
 
 <h2>Articles</h2>
 
