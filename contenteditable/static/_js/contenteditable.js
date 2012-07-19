@@ -5,11 +5,22 @@ $(function(){
   // turns design mode on for editable elements
   // this: the box element that contains all the editable elements
   function enableEditbox(){
-    var self = this;
-    $(self).addClass('ui-editbox-active')
-    .find('[data-editfield]:not(.locked)')
-    .attr('contenteditable', 'true')
-    .off('.editbox');
+    var self = this,
+        $box = $(self),
+        data = $box.data();
+    $box.addClass('ui-editbox-active');
+    var editables = $box.find('[data-editfield]:not(.locked)');
+    if (editables.length){
+      editables
+      .attr('contenteditable', 'true')
+      .off('.editbox');
+    } else if (data.editfield) {
+      $box
+      .attr('contenteditable', 'true')
+      .off('.editbox');
+    } else {
+      throw "nothingToEdit";
+    }
     // FIXME remove hack once we get real ui for determining when we're done
     $(document).on('click.editbox', function(evt){
       if (!$(evt.target).closest('.ui-editbox-active').length) {
