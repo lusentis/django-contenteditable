@@ -38,23 +38,37 @@ $(function(){
   // function saveEditbox
   // this: the box element that contains all the editable elements
   function saveEditbox(){
-    var $box = $(this);
-    var app = $box.attr('data-editapp');
-    var model = $box.attr('data-editmodel');
-    var pk = $box.attr('data-editpk');
-    save_data = {};
+    var $box = $(this),
+        data = $box.data(),
+        pk = data.editpk,
+        save_data = {};
+    if (!data.editmodel){
+      throw "missingModel";
+    }
     if (pk){
       save_data.id = pk;
+    } else if (data.editslug) {
+      save_data.slug = data.editslug;
+      if (data.editslugfield){
+        save_data.slugfield = data.editslugfield;
+      }
     } else {
       throw "missingPK";
     }
-    $box.find('[data-editfield]').each(function (_, el) {
-      var name = $(el).attr('data-editfield');
-      if (name) {
-        save_data[name] = el.innerHTML;
-      }
-    });
-    $contentEditable.save(model, save_data, function(data) {
+    var editables = $box.find('[data-editfield]');
+    if (editables.length) {
+      editables.each(function (_, el) {
+        var name = $(el).attr('data-editfield');
+        if (name) {
+          save_data[name] = el.innerHTML;
+        }
+      });
+    } else if (data.editfield) {
+      save_data[data.editfield] = $.trim($box.html());
+    } else {
+      throw "missingData";
+    }
+    $contentEditable.save(data.editmodel, save_data, function(data) {
       if (pk == "-1") {
         $box.attr('data-editpk', pk);
       }
