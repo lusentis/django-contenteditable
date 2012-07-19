@@ -13,7 +13,12 @@ $(function(){
     // FIXME remove hack once we get real ui for determining when we're done
     $(document).on('click.editbox', function(evt){
       if (!$(evt.target).closest('.ui-editbox-active').length) {
-        saveEditbox.call(self, evt);
+        try {
+          saveEditbox.call(self, evt);
+        } catch (e){
+          disableEditbox.call(self);
+          console.warn(e);
+        }
         $(document).off('.editbox');
       }
     });
@@ -38,13 +43,18 @@ $(function(){
     var model = $box.attr('data-editmodel');
     var pk = $box.attr('data-editpk');
     save_data = {};
+    if (pk){
+      save_data.id = pk;
+    } else {
+      throw "missingPK";
+    }
     $box.find('[data-editfield]').each(function (_, el) {
       var name = $(el).attr('data-editfield');
       if (name) {
         save_data[name] = el.innerHTML;
       }
     });
-    $contentEditable.save(model, pk, save_data, function(data) {
+    $contentEditable.save(model, save_data, function(data) {
       if (pk == "-1") {
         $box.attr('data-editpk', pk);
       }
@@ -67,7 +77,7 @@ $(function(){
   });
 
   // not an efficient selector but makes this easier to implement in the templates
-  $('*[data-editpk]').addClass('ui-editbox').on('dblclick', enableEditbox);
+  $('[data-editpk], [data-editslug]').addClass('ui-editbox').on('dblclick', enableEditbox);
 
   $('.returnsaves').each(function (_, el) {
     $(el).keypress(function(event) {
@@ -172,13 +182,12 @@ $contentEditable = {
   init: function (options) {
     jQuery.extend($contentEditable.options, options);
   },
-  save: function(model, id, data, success_callback) {
+  save: function(model, data, success_callback) {
     console.log("Saving to "+$contentEditable.options['url']);
     console.log(data);
 
     $.post($contentEditable.options['url'], jQuery.extend(data, {
-      'model': model,
-      'id': id
+      'model': model
     }))
     .success(function(response) {
       console.log("Saved: "+response);
