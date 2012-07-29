@@ -1,4 +1,6 @@
 from django import template
+from django.db.models import fields
+from django.utils.safestring import mark_safe
 
 """
 Builds a beautiful file uploader in pure JS and HTML5
@@ -10,6 +12,7 @@ Usage: {% insert_inlineedit_js container-id %}
 """
 
 register = template.Library()
+
 
 ## CSS
 @register.tag(name='insert_inlineedit_css')
@@ -55,9 +58,8 @@ class InlineeditCssTemplate(template.Node):
         </style>
         """
 
+
 ## EditableBox
-
-
 @register.simple_tag
 def editablebox(obj):
     data = (
@@ -70,6 +72,47 @@ def editablebox(obj):
 @register.simple_tag
 def editableattr(name, placeholder=""):
     return 'data-editfield="{0}" data-placeholder="{1}" '.format(name, placeholder)
+
+
+@register.tag(name='editable')
+def do_editable(parser, token):
+    try:
+        bits = token.split_contents()
+        if len(bits) == 3:
+            tag_name, field, container = token.split_contents()
+        else:
+            tag_name, field = token.split_contents()
+            container = "span"
+        objname, fieldname = field.split('.')
+    except ValueError as e:
+        raise template.TemplateSyntaxError("editable tag expects one argument "
+            "formatted like `object.field`, "
+            "%s" % e)
+    return EditableModelFieldNode(objname, fieldname, container)
+
+
+class EditableModelFieldNode(template.Node):
+    def __init__(self, objname, fieldname, container):
+        self.objname = template.Variable(objname)
+        self.fieldname = fieldname
+        self.container = template.Variable(container)
+
+    def render(self, context):
+        try:
+            obj = self.objname.resolve(context)
+            fieldname = self.fieldname
+            field = obj._meta.get_field(fieldname)
+            container = self.container.resolve(context)
+        except (template.VariableDoesNotExist, fields.FieldDoesNotExist):
+            return ''
+        attrs = ['data-editfield="%s"' % fieldname,
+                 'data-placeholder="%s"' % (field.default if field.default != fields.NOT_PROVIDED else ''),
+                 'data-editwidget="%s"' % field.__class__.__name__]
+        out = '<{0} {1}>{2}</{0}>'.format(container,
+                                          " ".join(attrs),
+                                          getattr(obj, fieldname))
+        return mark_safe(out)
+
 
 ## EditableItem
 @register.tag(name='editableitem')
@@ -96,6 +139,7 @@ class EditableItemTemplate(template.Node):
             self.data_model, self.data_id, self.data_name, self.data_placeholder
         )
 
+
 try:
     import chunks  # only expose if chunks is installed
 
@@ -116,7 +160,7 @@ def do_deletebutton(parser, token):
         tag_name, data_model, data_id = token.split_contents()
         return DeleteButtonTemplate(data_model, data_id)
     except ValueError:
-        raise template.TemplateSyntaxError("%r tag requires data_model, data_id arguments and data_id must resolve in context." % toke.contents.split()[0])
+        raise template.TemplateSyntaxError("%r tag requires data_model, data_id arguments and data_id must resolve in context." % token.contents.split()[0])
 
 
 class DeleteButtonTemplate(template.Node):
