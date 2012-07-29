@@ -1,6 +1,6 @@
 from django.conf import settings
 
-# to enable or disable contenteditable functionality. affects the
+# To enable or disable contenteditable functionality. Affects the
 # templatetags and the views. You may not want this enabled in production
 # because of caching and exposing primary keys.
 CONTENTEDITABLE_ENABLED = getattr(settings, 'CONTENTEDITABLE_ENABLED',
@@ -14,7 +14,7 @@ CONTENTEDITABLE_ENABLED = getattr(settings, 'CONTENTEDITABLE_ENABLED',
 # )
 CONTENTEDITABLE_MODELS = None
 
-# CONTENTEDITABLE_MODELS gets transformered below into two internally used
+# CONTENTEDITABLE_MODELS gets transformed below into two internally used
 # settings: editable_models and e_models
 # editable_models is just the dict version of CONTENTEDITABLE_MODELS
 # and e_models is just a convenience for getting the full app+model name
