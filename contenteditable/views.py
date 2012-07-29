@@ -16,16 +16,17 @@ class UpdateView(View, SingleObjectMixin):
     http_method_names = ['post', 'put']  # TODO delete
 
     def get_editable_model_and_fields(self, data):
-        modelname = data.pop('model')
-        # TODO use data['appname'] if it's available
+        model_name = data.pop('model')
         try:
             if 'app' in data:
-                appname = data.pop('app')
-                editable_fields = editable_models["%s.%s" % (appname, modelname)]
-                model = models.get_model(appname, modelname)
+                app_name = data.pop('app')
+                full_model_name = "%s.%s" % (app_name, model_name)
             else:
-                appname, editable_fields = e_models[modelname]
-                model = models.get_model(appname, modelname)
+                # missing app name, guess it based on the model name
+                full_model_name = e_models[model_name]
+                app_name = full_model_name.split('.')[0]
+            editable_fields = editable_models[full_model_name]
+            model = models.get_model(app_name, model_name)
         # TODO except model does not exist
         except KeyError:
             raise ValueError('Unknown model: {0}'.format(model))

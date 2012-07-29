@@ -16,6 +16,9 @@ CONTENTEDITABLE_MODELS = None
 
 # CONTENTEDITABLE_MODELS gets transformered below into two internally used
 # settings: editable_models and e_models
+# editable_models is just the dict version of CONTENTEDITABLE_MODELS
+# and e_models is just a convenience for getting the full app+model name
+# from just the model name
 
 try:
     if not CONTENTEDITABLE_ENABLED:
@@ -23,10 +26,11 @@ try:
         raise AttributeError
     CONTENTEDITABLE_MODELS = getattr(settings, 'CONTENTEDITABLE_MODELS')
     editable_models = dict(CONTENTEDITABLE_MODELS)
+    # build model to app.model lookup dict
     e_models = dict()
-    for appmodel, fields in CONTENTEDITABLE_MODELS:
-        app, model = appmodel.split(".")
-        e_models[model] = (app, fields)
+    for appmodel, _ in CONTENTEDITABLE_MODELS:
+        _, model = appmodel.split(".")
+        e_models[model] = appmodel
 except AttributeError:
     editable_models = None
     e_models = None

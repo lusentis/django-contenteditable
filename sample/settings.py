@@ -152,7 +152,7 @@ LOGGING = {
 }
 
 
-CONTENTEDITABLE_ENABLED = False
+CONTENTEDITABLE_ENABLED = True
 
 CONTENTEDITABLE_MODELS = (
     ('newspaper.article', ('title', 'text')),
