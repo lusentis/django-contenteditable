@@ -1,4 +1,6 @@
 from django import template
+from django.db.models import fields
+from django.utils.safestring import mark_safe
 
 from ..settings import CONTENTEDITABLE_ENABLED
 
@@ -13,6 +15,7 @@ Usage: {% insert_inlineedit_js container-id %}
 """
 
 register = template.Library()
+
 
 ## CSS
 @register.tag(name='insert_inlineedit_css')
@@ -58,9 +61,8 @@ class InlineeditCssTemplate(template.Node):
         </style>
         """
 
+
 ## EditableBox
-
-
 @register.simple_tag
 def editablebox(obj):
     if not CONTENTEDITABLE_ENABLED:
@@ -106,6 +108,7 @@ class EditableItemTemplate(template.Node):
             self.data_model, self.data_id, self.data_name, self.data_placeholder
         )
 
+
 try:
     import chunks  # only expose if chunks is installed
 
@@ -128,7 +131,7 @@ def do_deletebutton(parser, token):
         tag_name, data_model, data_id = token.split_contents()
         return DeleteButtonTemplate(data_model, data_id)
     except ValueError:
-        raise template.TemplateSyntaxError("%r tag requires data_model, data_id arguments and data_id must resolve in context." % toke.contents.split()[0])
+        raise template.TemplateSyntaxError("%r tag requires data_model, data_id arguments and data_id must resolve in context." % token.contents.split()[0])
 
 
 class DeleteButtonTemplate(template.Node):
