@@ -1,7 +1,12 @@
 *.egg-info
 *.pyc
-*.swp
 build/*
 dist/
 sample/*.sqlite
 sample/contenteditable
+
+# editors
+*.swp
+.codeintel
+*.sublime-project
+*.sublime-workspace
