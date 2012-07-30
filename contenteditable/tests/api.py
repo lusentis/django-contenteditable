@@ -25,7 +25,7 @@ class LoggedInTestCase(BaseTestCase):
         self.client.login(username='test', password='test')
 
 
-class HTTPMethodsTestCase(LoggedInTestCase):
+class HTTPMethods(LoggedInTestCase):
     def test_get_is_not_allowed(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 405)
@@ -53,3 +53,12 @@ class Updates(LoggedInTestCase):
         self.assertEqual(response.status_code, 200)
         obj = Article.objects.get(pk=1)
         self.assertEqual(obj.title, new_title)
+
+
+class Permissions(BaseTestCase):
+    def test_anonymous_is_rejected(self):
+        response = self.client.post(self.url, self.base_data)
+        self.assertEqual(response.status_code, 403)
+        self.client.login(username='test', password='test')
+        response = self.client.post(self.url, self.base_data)
+        self.assertEqual(response.status_code, 200)
