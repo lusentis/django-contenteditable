@@ -81,6 +81,46 @@ def editableattr(name, placeholder=""):
     return 'data-editfield="{0}" data-placeholder="{1}" '.format(name, placeholder)
 
 
+@register.tag(name='editable')
+def do_editable(parser, token):
+    try:
+        bits = token.split_contents()
+        if len(bits) == 3:
+            tag_name, field, container = token.split_contents()
+        else:
+            tag_name, field = token.split_contents()
+            container = "span"
+        objname, fieldname = field.split('.')
+    except ValueError as e:
+        raise template.TemplateSyntaxError("editable tag expects one argument "
+            "formatted like `object.field`, "
+            "%s" % e)
+    return EditableModelFieldNode(objname, fieldname, container)
+
+
+class EditableModelFieldNode(template.Node):
+    def __init__(self, objname, fieldname, container):
+        self.objname = template.Variable(objname)
+        self.fieldname = fieldname
+        self.container = template.Variable(container)
+
+    def render(self, context):
+        try:
+            obj = self.objname.resolve(context)
+            fieldname = self.fieldname
+            field = obj._meta.get_field(fieldname)
+            container = self.container.resolve(context)
+        except (template.VariableDoesNotExist, fields.FieldDoesNotExist):
+            return ''
+        attrs = ['data-editfield="%s"' % fieldname,
+                 'data-placeholder="%s"' % (field.default if field.default != fields.NOT_PROVIDED else ''),
+                 'data-editwidget="%s"' % field.__class__.__name__]
+        out = '<{0} {1}>{2}</{0}>'.format(container,
+                                          " ".join(attrs),
+                                          getattr(obj, fieldname))
+        return mark_safe(out)
+
+
 ## EditableItem
 @register.tag(name='editableitem')
 def do_editableitem(parser, token):
