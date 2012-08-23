@@ -78,7 +78,8 @@ def editablebox(obj):
 def editableattr(name, placeholder=""):
     if not settings.CONTENTEDITABLE_ENABLED:
         return ''
-    return 'data-editfield="{0}" data-placeholder="{1}" '.format(name, placeholder)
+    return 'data-editfield="{0}" data-placeholder="{1}" '.\
+        format(name, placeholder)
 
 
 @register.tag(name='editable')
@@ -112,9 +113,11 @@ class EditableModelFieldNode(template.Node):
             container = self.container.resolve(context)
         except (template.VariableDoesNotExist, fields.FieldDoesNotExist):
             return ''
-        base_string = '<{0} {1}>{2}</{0}>' if settings.CONTENTEDITABLE_ENABLED else '<{0}>{2}</{0}>'
+        base_string = '<{0} {1}>{2}</{0}>' if settings.CONTENTEDITABLE_ENABLED\
+            else '<{0}>{2}</{0}>'
         attrs = ['data-editfield="%s"' % fieldname,
-                 'data-placeholder="%s"' % (field.default if field.default != fields.NOT_PROVIDED else ''),
+                 'data-placeholder="%s"' % (field.default if
+                     field.default != fields.NOT_PROVIDED else ''),
                  'data-editwidget="%s"' % field.__class__.__name__]
         out = base_string.format(container, " ".join(attrs),
                                  getattr(obj, fieldname))
