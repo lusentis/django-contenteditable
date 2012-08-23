@@ -1,5 +1,5 @@
 Django>=1.4
-django-chunks>=0.2
+django-chunks==0.1
 dj-database-url==0.2.1
 
 # heroku
