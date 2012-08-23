@@ -150,3 +150,11 @@ LOGGING = {
         },
     }
 }
+
+
+CONTENTEDITABLE_ENABLED = True
+
+CONTENTEDITABLE_MODELS = (
+    ('newspaper.article', ('title', 'text')),
+    ('chunks.chunk', ('content',)),
+)

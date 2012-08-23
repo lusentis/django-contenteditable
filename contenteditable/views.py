@@ -2,35 +2,50 @@ import json
 
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.contrib.auth.views import login_required
+from django.db import models
 from django.views.decorators.http import require_POST
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 
 from contenteditable.utils import content_delete
 
-from contenteditablesettings import CONTENTEDITABLE_MODELS
+from .settings import editable_models, e_models
 
 
 class UpdateView(View, SingleObjectMixin):
-    http_method_names = ['post']
+    http_method_names = ['post', 'put']  # TODO delete
 
-    def post(self, request, *args, **kwargs):
-        data = request.POST.dict().copy()
-        model = data.pop('model')
-        # TODO: model may not correspond to actual model name
-        if CONTENTEDITABLE_MODELS.get(model) is None:
+    def get_editable_model_and_fields(self, data):
+        model_name = data.pop('model')
+        try:
+            if 'app' in data:
+                app_name = data.pop('app')
+                full_model_name = "%s.%s" % (app_name, model_name)
+            else:
+                # missing app name, guess it based on the model name
+                full_model_name = e_models[model_name]
+                app_name = full_model_name.split('.')[0]
+            editable_fields = editable_models[full_model_name]
+            model = models.get_model(app_name, model_name)
+        # TODO except model does not exist
+        except KeyError:
             raise ValueError('Unknown model: {0}'.format(model))
-        if not request.user.has_perm(model):
+
+        if not self.request.user.has_perm(model):
+            # TODO raise Exception
             return HttpResponseForbidden(
                 json.dumps(dict(message='User does not have permission')),
                 content_type='application/json')
-        e_conf = CONTENTEDITABLE_MODELS[model]
-        self.model = e_conf[0]
+        return model, editable_fields
+
+    def post(self, request, *args, **kwargs):
+        data = request.POST.dict().copy()
+        self.model, editable_fields = self.get_editable_model_and_fields(data)
         if 'slugfield' in data:
             self.slug_field = data.pop('slugfield')
         self.kwargs.update(data)
         obj = self.get_object()
-        for fieldname in e_conf[1]:
+        for fieldname in editable_fields:
             if fieldname in data:
                 obj.__setattr__(fieldname, data.pop(fieldname))
         obj.save()  # TODO only save if changed
@@ -45,18 +60,16 @@ class UpdateView(View, SingleObjectMixin):
     def put(self, request, *args, **kwargs):
         # TODO test this
         data = request.POST.dict().copy()
-        model = data.pop('model')
-        e_conf = CONTENTEDITABLE_MODELS[model]
-        model = e_conf[0]
+        model, editable_fields = self.get_editable_model_and_fields(data)
         obj_data = {}
         if 'slugfield' in data:
             # inserting stuff that uses slugs probably won't work unless the
             # slug is one of the editable attributes
             slug_field = data.pop('slugfield')
             obj_data[slug_field] = data.pop('slug')
-        for k in e_conf[1]:
-            if k in data:
-                obj_data[k] = data.pop(k)
+        for fieldname in editable_fields:
+            if fieldname in data:
+                obj_data[fieldname] = data.pop(fieldname)
         obj = model.objects.create(**obj_data)
         return HttpResponse(
             json.dumps(dict(message='ok', pk=obj.pk)),
