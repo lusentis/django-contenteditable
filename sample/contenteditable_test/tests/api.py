@@ -1,6 +1,7 @@
-from django.test import TestCase
-from django.utils import unittest
 from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils import unittest
 
 from sample.newspaper.models import Article
 
@@ -62,3 +63,15 @@ class Permissions(BaseTestCase):
         self.client.login(username='test', password='test')
         response = self.client.post(self.url, self.base_data)
         self.assertEqual(response.status_code, 200)
+
+
+class Settings(LoggedInTestCase):
+    @override_settings(CONTENTEDITABLE_ENABLED=False)
+    def test_api_is_off_when_disabled(self):
+        old_title = self.obj.title
+        new_title = old_title + " sucks"
+        response = self.client.post(self.url,
+                   self.generate({'title': new_title}))
+        self.assertEqual(response.status_code, 404)
+        obj = Article.objects.get(pk=1)
+        self.assertEqual(obj.title, old_title)

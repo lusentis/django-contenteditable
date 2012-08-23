@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.test.signals import setting_changed
 
 # To enable or disable contenteditable functionality. Affects the
 # templatetags and the views. You may not want this enabled in production
@@ -34,3 +35,11 @@ try:
 except AttributeError:
     editable_models = None
     e_models = None
+
+
+def settings_modified(sender, setting, value, **kwargs):
+    """ signal handler for testing """
+    global CONTENTEDITABLE_ENABLED
+    if setting == 'CONTENTEDITABLE_ENABLED':
+        CONTENTEDITABLE_ENABLED = value
+setting_changed.connect(settings_modified)
