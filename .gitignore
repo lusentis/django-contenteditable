@@ -1,6 +1,7 @@
 *.egg-info
 *.pyc
 *.swp
+bin/*
 build/*
 dist/
 sample/*.sqlite
