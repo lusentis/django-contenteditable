@@ -12,6 +12,11 @@ from contenteditable.utils import content_delete
 from .settings import editable_models, e_models
 
 
+class NoPermission(Exception):
+    message = 'User does not have permission'
+    pass
+
+
 class UpdateView(View, SingleObjectMixin):
     http_method_names = ['post', 'put']  # TODO delete
 
@@ -30,17 +35,18 @@ class UpdateView(View, SingleObjectMixin):
         # TODO except model does not exist
         except KeyError:
             raise ValueError('Unknown model: {0}'.format(model))
-
         if not self.request.user.has_perm(model):
-            # TODO raise Exception
-            return HttpResponseForbidden(
-                json.dumps(dict(message='User does not have permission')),
-                content_type='application/json')
+            raise NoPermission
         return model, editable_fields
 
     def post(self, request, *args, **kwargs):
         data = request.POST.dict().copy()
-        self.model, editable_fields = self.get_editable_model_and_fields(data)
+        try:
+            self.model, editable_fields = self.get_editable_model_and_fields(data)
+        except NoPermission as e:
+            return HttpResponseForbidden(
+                json.dumps(dict(message=e.message)),
+                content_type='application/json')
         if 'slugfield' in data:
             self.slug_field = data.pop('slugfield')
         self.kwargs.update(data)
