@@ -65,8 +65,8 @@ class Permissions(BaseTestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@override_settings(CONTENTEDITABLE_ENABLED=False)
 class Settings(LoggedInTestCase):
-    @override_settings(CONTENTEDITABLE_ENABLED=False)
     def test_api_is_off_when_disabled(self):
         old_title = self.obj.title
         new_title = old_title + " sucks"
@@ -75,3 +75,10 @@ class Settings(LoggedInTestCase):
         self.assertEqual(response.status_code, 404)
         obj = Article.objects.get(pk=1)
         self.assertEqual(obj.title, old_title)
+
+    def test_tags_do_nothing_when_disabled(self):
+        from contenteditable.templatetags import inlineedit
+        # TODO split into separate tests
+        self.assertEqual(inlineedit.editablebox(self.obj), '')
+        self.assertEqual(inlineedit.editableattr('name', 'placeholder'), '')
+        # TODO test {% editable %}
