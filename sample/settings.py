@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'contenteditable',
+    'contenteditable_test',
     'newspaper',
     'chunks',
 )
