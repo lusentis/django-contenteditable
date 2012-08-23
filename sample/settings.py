@@ -105,6 +105,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    # 'django_pdb.middleware.PdbMiddleware',
 )
 
 ROOT_URLCONF = 'sample.urls'
@@ -127,6 +128,7 @@ INSTALLED_APPS = (
     'contenteditable_test',
     'newspaper',
     'chunks',
+    'django_pdb',
 )
 
 # A sample logging configuration. The only tangible logging
