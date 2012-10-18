@@ -1,6 +1,7 @@
 Django>=1.4
 django-chunks==0.1
 dj-database-url==0.2.1
+django-pdb>=0.3.2
 
 # heroku
 psycopg2==2.4.5

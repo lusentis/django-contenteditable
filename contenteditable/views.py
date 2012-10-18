@@ -1,6 +1,7 @@
 import json
 
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import (Http404, HttpResponse, HttpResponseForbidden,
+    HttpResponseBadRequest)
 from django.contrib.auth.views import login_required
 from django.db import models
 from django.views.decorators.http import require_POST
@@ -9,7 +10,12 @@ from django.views.generic.detail import SingleObjectMixin
 
 from contenteditable.utils import content_delete
 
-from .settings import editable_models, e_models
+from . import settings
+
+
+class NoPermission(Exception):
+    message = 'User does not have permission'
+    pass
 
 
 class UpdateView(View, SingleObjectMixin):
@@ -23,24 +29,28 @@ class UpdateView(View, SingleObjectMixin):
                 full_model_name = "%s.%s" % (app_name, model_name)
             else:
                 # missing app name, guess it based on the model name
-                full_model_name = e_models[model_name]
+                full_model_name = settings.e_models[model_name]
                 app_name = full_model_name.split('.')[0]
-            editable_fields = editable_models[full_model_name]
+            editable_fields = settings.editable_models[full_model_name]
             model = models.get_model(app_name, model_name)
         # TODO except model does not exist
         except KeyError:
             raise ValueError('Unknown model: {0}'.format(model))
-
         if not self.request.user.has_perm(model):
-            # TODO raise Exception
-            return HttpResponseForbidden(
-                json.dumps(dict(message='User does not have permission')),
-                content_type='application/json')
+            raise NoPermission
         return model, editable_fields
 
     def post(self, request, *args, **kwargs):
+        if (not settings.CONTENTEDITABLE_ENABLED):
+            # pretend that we don't exist
+            raise Http404
         data = request.POST.dict().copy()
-        self.model, editable_fields = self.get_editable_model_and_fields(data)
+        try:
+            self.model, editable_fields = self.get_editable_model_and_fields(data)
+        except NoPermission as e:
+            return HttpResponseForbidden(
+                json.dumps(dict(message=e.message)),
+                content_type='application/json')
         if 'slugfield' in data:
             self.slug_field = data.pop('slugfield')
         self.kwargs.update(data)
@@ -58,6 +68,9 @@ class UpdateView(View, SingleObjectMixin):
         #         content_type='application/json')
 
     def put(self, request, *args, **kwargs):
+        if (not settings.CONTENTEDITABLE_ENABLED):
+            # pretend that we don't exist
+            raise Http404
         # TODO test this
         data = request.POST.dict().copy()
         model, editable_fields = self.get_editable_model_and_fields(data)

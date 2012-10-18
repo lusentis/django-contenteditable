@@ -2,7 +2,7 @@ from django import template
 from django.db.models import fields
 from django.utils.safestring import mark_safe
 
-from ..settings import CONTENTEDITABLE_ENABLED
+from .. import settings
 
 
 """
@@ -65,7 +65,7 @@ class InlineeditCssTemplate(template.Node):
 ## EditableBox
 @register.simple_tag
 def editablebox(obj):
-    if not CONTENTEDITABLE_ENABLED:
+    if not settings.CONTENTEDITABLE_ENABLED:
         return ''
     data = (
         obj._meta.app_label,
@@ -76,9 +76,52 @@ def editablebox(obj):
 
 @register.simple_tag
 def editableattr(name, placeholder=""):
-    if not CONTENTEDITABLE_ENABLED:
+    if not settings.CONTENTEDITABLE_ENABLED:
         return ''
-    return 'data-editfield="{0}" data-placeholder="{1}" '.format(name, placeholder)
+    return 'data-editfield="{0}" data-placeholder="{1}" '.\
+        format(name, placeholder)
+
+
+@register.tag(name='editable')
+def do_editable(parser, token):
+    try:
+        bits = token.split_contents()
+        if len(bits) == 3:
+            tag_name, field, container = token.split_contents()
+        else:
+            tag_name, field = token.split_contents()
+            container = "span"
+        objname, fieldname = field.split('.')
+    except ValueError as e:
+        raise template.TemplateSyntaxError("editable tag expects one argument "
+            "formatted like `object.field`, "
+            "%s" % e)
+    return EditableModelFieldNode(objname, fieldname, container)
+
+
+class EditableModelFieldNode(template.Node):
+    def __init__(self, objname, fieldname, container):
+        self.objname = template.Variable(objname)
+        self.fieldname = fieldname
+        self.container = template.Variable(container)
+
+    def render(self, context):
+        try:
+            obj = self.objname.resolve(context)
+            fieldname = self.fieldname
+            field = obj._meta.get_field(fieldname)
+            container = self.container.resolve(context)
+        except (template.VariableDoesNotExist, fields.FieldDoesNotExist):
+            return ''
+        base_string = '<{0} {1}>{2}</{0}>' if settings.CONTENTEDITABLE_ENABLED\
+            else '<{0}>{2}</{0}>'
+        attrs = ['data-editfield="%s"' % fieldname,
+                 'data-placeholder="%s"' % (field.default if
+                     field.default != fields.NOT_PROVIDED else ''),
+                 'data-editwidget="%s"' % field.__class__.__name__]
+        out = base_string.format(container, " ".join(attrs),
+                                 getattr(obj, fieldname))
+        return mark_safe(out)
 
 
 ## EditableItem
@@ -99,7 +142,7 @@ class EditableItemTemplate(template.Node):
         self.data_placeholder = data_placeholder
 
     def render(self, context):
-        if not CONTENTEDITABLE_ENABLED:
+        if not settings.CONTENTEDITABLE_ENABLED:
             return ''
         if not '{0}'.format(self.data_id).startswith('"'):
             self.data_id = self.data_id.resolve(context)
@@ -114,7 +157,7 @@ try:
 
     @register.simple_tag
     def editablechunk(key):
-        if not CONTENTEDITABLE_ENABLED:
+        if not settings.CONTENTEDITABLE_ENABLED:
             return ''
         return ('data-editapp="chunks" data-editmodel="chunk" '
                 'data-editslugfield="key"'
